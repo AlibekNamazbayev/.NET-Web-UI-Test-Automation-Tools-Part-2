@@ -1,20 +1,23 @@
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.IO;
 
 namespace SeleniumTests.Tests
 {
-    public abstract class TestBase
+    public class TestBase
     {
         protected IWebDriver Driver { get; private set; } = null!;
         protected ChromeOptions Options { get; private set; } = null!;
-        protected string DownloadDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Downloads");
+        protected WebDriverWait Wait { get; private set; } = null!;
+        protected string DownloadDirectory { get; private set; } = null!;
 
         [OneTimeSetUp]
         public void GlobalSetup()
         {
+            DownloadDirectory = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Downloads");
             if (!Directory.Exists(DownloadDirectory))
             {
                 Directory.CreateDirectory(DownloadDirectory);
@@ -38,13 +41,21 @@ namespace SeleniumTests.Tests
             Options.AddUserProfilePreference("safebrowsing.enabled", true);
 
             Driver = new ChromeDriver(Options);
+            Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
             Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
         }
 
         [TearDown]
         public void TearDown()
         {
-            Driver.Quit();
+            try
+            {
+                Driver?.Quit();
+            }
+            catch (Exception ex)
+            {
+                TestContext.WriteLine($"Error closing WebDriver: {ex.Message}");
+            }
         }
     }
 }

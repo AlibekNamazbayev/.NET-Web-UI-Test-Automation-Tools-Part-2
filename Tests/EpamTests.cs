@@ -1,8 +1,9 @@
 using NUnit.Framework;
 using System;
 using System.IO;
-using System.Threading;
+using System.Threading.Tasks;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using SeleniumTests.Pages;
 
 namespace SeleniumTests.Tests
@@ -12,7 +13,7 @@ namespace SeleniumTests.Tests
     {
         [Test]
         [TestCase("EPAM_Corporate_Overview_Q4FY-2024.pdf")]
-        public void ValidateFileDownload(string expectedFileName)
+        public async Task ValidateFileDownload(string expectedFileName)
         {
             Driver.Navigate().GoToUrl("https://www.epam.com/");
 
@@ -25,18 +26,18 @@ namespace SeleniumTests.Tests
 
             string downloadPath = Path.Combine(DownloadDirectory, expectedFileName);
             bool fileDownloaded = false;
-            int waitSeconds = 30;
-            for (int i = 0; i < waitSeconds; i++)
+
+            for (int i = 0; i < 30; i++)
             {
                 if (File.Exists(downloadPath))
                 {
                     fileDownloaded = true;
                     break;
                 }
-                Thread.Sleep(1000);
+                await Task.Delay(1000);
             }
 
-            Assert.That(fileDownloaded, Is.True, $"Файл {expectedFileName} не был скачан.");
+            Assert.That(fileDownloaded, Is.True, $"File {expectedFileName} was not downloaded.");
         }
 
         [Test]
@@ -52,11 +53,10 @@ namespace SeleniumTests.Tests
 
             insightsPage.ClickReadMore();
 
-            Thread.Sleep(2000);
-            var actualTitleElement = Driver.FindElement(By.XPath("//span[@class='museo-sans-light']"));
+            var actualTitleElement = Wait.Until(driver => driver.FindElement(By.XPath("//span[@class='museo-sans-light']")));
             string actualTitle = actualTitleElement.Text;
 
-            Assert.That(actualTitle, Is.EqualTo(expectedTitle), "Заголовок статьи не совпадает.");
+            Assert.That(actualTitle, Is.EqualTo(expectedTitle), "Article title does not match.");
         }
     }
 }
