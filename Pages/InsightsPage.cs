@@ -23,7 +23,7 @@ namespace SeleniumTests.Pages
             }
             catch (NoSuchElementException)
             {
-                // Если баннера нет — продолжаем тест
+                
             }
         }
 
@@ -33,7 +33,6 @@ namespace SeleniumTests.Pages
             {
                 CloseCookieBanner();
 
-                // Кликаем дважды на кнопку "Next" в карусели
                 var nextButton = Wait.Until(ExpectedConditions.ElementToBeClickable(
                     By.CssSelector("button.slider__right-arrow.slider-navigation-arrow")));
                 nextButton.Click();
@@ -41,14 +40,13 @@ namespace SeleniumTests.Pages
                 nextButton.Click();
                 Thread.Sleep(1000);
 
-                // Получаем заголовок статьи в карусели
                 var titleElement = Wait.Until(ExpectedConditions.ElementIsVisible(
                     By.XPath("//span[@class='museo-sans-light' and contains(text(),'Three Ways Leaders Impede Their Company’s')]")));
                 return titleElement.Text;
             }
             catch (WebDriverTimeoutException)
             {
-                throw new Exception("Не удалось найти заголовок статьи в карусели.");
+                throw new Exception("Failed to find the article title in the carousel.");
             }
         }
 
@@ -56,20 +54,20 @@ namespace SeleniumTests.Pages
         {
             try
             {
-                // Ищем первую кнопку "Read More", используя XPath по тексту и классу
+                // Find the first "Read More" button using XPath by text and class
                 var readMoreButton = Wait.Until(ExpectedConditions.ElementToBeClickable(
                     By.XPath("(//a[contains(@class,'slider-cta-link') and contains(text(),'Read More')])[1]")));
                 
-                // Прокручиваем к кнопке
+                // Scroll to the button
                 ((IJavaScriptExecutor)Driver).ExecuteScript("arguments[0].scrollIntoView(true);", readMoreButton);
                 Thread.Sleep(1000);
 
-                // Кликаем по кнопке
+                // Click the button
                 readMoreButton.Click();
             }
             catch (WebDriverTimeoutException)
             {
-                throw new Exception("Кнопка 'Read More' не найдена или недоступна.");
+                throw new Exception("The 'Read More' button was not found or is unavailable.");
             }
         }
 
@@ -77,14 +75,13 @@ namespace SeleniumTests.Pages
         {
             try
             {
-                // Получаем заголовок статьи на странице (ожидаем, что он содержит "The Complex Path of Generative AI Adoption")
                 var articleTitle = Wait.Until(ExpectedConditions.ElementIsVisible(
                     By.XPath("//span[@class='museo-sans-light' and contains(text(),'The Complex Path of Generative AI Adoption')]")));
                 return articleTitle.Text;
             }
             catch (WebDriverTimeoutException)
             {
-                throw new Exception("Не удалось найти заголовок статьи на странице.");
+                throw new Exception("Failed to find the article title on the page.");
             }
         }
     }
